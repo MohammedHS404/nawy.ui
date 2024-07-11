@@ -1,4 +1,4 @@
-export class PropertyListResponse {
+export class PropertyResponse {
     public id: number
     public type: string
     public createdAt: Date
