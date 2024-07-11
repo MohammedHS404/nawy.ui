@@ -3,7 +3,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import AppNavbar from "./components/appNavbar";
 import { NextUIProvider } from "@nextui-org/system";
-import PropertyFilters from "./components/propertyFilters";
+import AppPropertyFilters from "./components/appPropertyFilters";
+import BreadCrumbs from "./components/breadCrumbs";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,9 +23,13 @@ export default function RootLayout({
       <body className={inter.className}>
         <NextUIProvider>
           <AppNavbar />
-          <PropertyFilters />
+          <AppPropertyFilters />
+          <BreadCrumbs />
           {children}
         </NextUIProvider>
+        <footer className="mt-8 text-center py-4 border-t-1 border-gray-200">
+          &copy; 2021 Nawy Estate
+        </footer>
       </body>
     </html>
   );

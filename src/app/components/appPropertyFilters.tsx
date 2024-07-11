@@ -1,20 +1,20 @@
 'use client'
 import { Button } from '@nextui-org/button';
 import { Input } from '@nextui-org/input';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 
-const PropertyFilters = () => {
+const AppPropertyFilters = () => {
 
     const router = useRouter();
-    const pathname = usePathname();
+    const pathname = "/"
     const searchParams = useSearchParams();
     const urlSearchParams = new URLSearchParams(searchParams.toString());
     const showFilters = searchParams.get('showFilters') == 'true';
 
-    const [minPrice, setMinPrice] = useState(searchParams.get('minPrice') || "");
+    const [minPrice, setMinPrice] = useState("");
 
     const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') || "");
 
@@ -30,7 +30,8 @@ const PropertyFilters = () => {
 
     const [maxArea, setMaxArea] = useState(searchParams.get('maxArea') || "");
 
-    const handleFilterChange = useDebouncedCallback(() => {
+
+    const handleFilterChange = () => {
         if (minPrice) urlSearchParams.set('minPrice', minPrice);
         else urlSearchParams.delete('minPrice');
 
@@ -56,21 +57,35 @@ const PropertyFilters = () => {
         else urlSearchParams.delete('maxArea');
 
         router.replace(`${pathname}?${urlSearchParams.toString()}`);
-    }, 500);
+    };
 
-    useEffect(() => {
-        handleFilterChange();
-    }, [minPrice, maxPrice, minBedrooms, maxBedrooms, minBathrooms, maxBathrooms, minArea, maxArea]);
+    const clearFilterChange = () => {
+        setMinPrice('');
+        setMaxPrice('');
+        setMinBedrooms('');
+        setMaxBedrooms('');
+        setMinBathrooms('');
+        setMaxBathrooms('');
+        setMinArea('');
+        setMaxArea('');
+    };
 
     if (!showFilters) {
         return <></>
     }
 
     return (
-        <div className='w-full p-6'>
+        <form className='w-full p-6'
+            onSubmit={
+                (e) => {
+                    e.preventDefault();
+                    handleFilterChange();
+                }
+            }
+        >
             <div className='h-full w-full grid grid-cols-4 gap-8'>
-
                 <Input
+                    type='number'
                     isClearable
                     label="Min Price"
                     value={minPrice}
@@ -79,6 +94,7 @@ const PropertyFilters = () => {
                 />
 
                 <Input
+                    type='number'
                     isClearable
                     label="Max Price"
                     value={maxPrice}
@@ -86,8 +102,8 @@ const PropertyFilters = () => {
                     onClear={() => setMaxPrice('')}
                 />
 
-
                 <Input
+                    type='number'
                     isClearable
                     label="Min Bedrooms"
                     value={minBedrooms}
@@ -97,6 +113,7 @@ const PropertyFilters = () => {
 
 
                 <Input
+                    type='number'
                     isClearable
                     label="Max Bedrooms"
                     value={maxBedrooms}
@@ -106,6 +123,7 @@ const PropertyFilters = () => {
 
 
                 <Input
+                    type='number'
                     isClearable
                     label="Min Bathrooms"
                     value={minBathrooms}
@@ -115,6 +133,7 @@ const PropertyFilters = () => {
 
 
                 <Input
+                    type='number'
                     isClearable
                     label="Max Bathrooms"
                     value={maxBathrooms}
@@ -124,6 +143,7 @@ const PropertyFilters = () => {
 
 
                 <Input
+                    type='number'
                     isClearable
                     label="Min Area"
                     value={minArea}
@@ -133,15 +153,22 @@ const PropertyFilters = () => {
 
 
                 <Input
+                    type='number'
                     isClearable
                     label="Max Area"
                     value={maxArea}
                     onChange={(e) => setMaxArea(e.target.value)}
                     onClear={() => setMaxArea('')}
                 />
+
+                <input type='submit' className='hidden' />
             </div>
-        </div>
+            <div className='flex justify-end mt-4 space-x-2'>
+                <Button onClick={clearFilterChange}>Clear</Button>
+                <Button onClick={handleFilterChange}>Apply Filters</Button>
+            </div>
+        </form>
     );
 };
 
-export default PropertyFilters;
+export default AppPropertyFilters;

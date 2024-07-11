@@ -1,13 +1,13 @@
 'use client'
 
 import Image from 'next/image'
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { PropertyResponse } from "./types/propertyResponse";
 import AppPagination from './components/appPagination';
 import { Skeleton } from '@nextui-org/skeleton';
 import { useDebouncedCallback } from 'use-debounce';
-import { imageShimmerBase64 } from './ImageShimmerSrc';
+import { imageShimmerBase64 } from './components/ImageShimmerSrc';
 import { PaginationDto, PropertyFiltersDto, PropertyListRequest } from './types/PropertyListRequest';
 
 interface GetPropertiesResponse {
@@ -104,6 +104,8 @@ export default function Home() {
 }
 
 function PropertyCard({ property, loading }: { property?: PropertyResponse, loading?: boolean }) {
+  const router=useRouter();
+
   if (!property && !loading) {
     return <></>;
   }
@@ -112,8 +114,12 @@ function PropertyCard({ property, loading }: { property?: PropertyResponse, load
     property = {} as PropertyResponse;
   }
 
+  function handleCardClick() {
+    router.push(`/${property?.slug}`);
+  }
+
   return (
-    <div className="w-full cursor-pointer transform rounded-lg bg-white  shadow-md duration-300 hover:scale-105 hover:shadow-lg">
+    <div onClick={e=>handleCardClick()} className="w-full cursor-pointer transform rounded-lg bg-white  shadow-md duration-300 hover:scale-105 hover:shadow-lg">
       {loading ?
         <Skeleton className="h-72 w-full object-cover object-center"></Skeleton> :
         <Image

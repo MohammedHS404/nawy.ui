@@ -32,7 +32,7 @@ export default function AppNavbar() {
     }
 
     return (
-        <Navbar onMenuOpenChange={setIsMenuOpen} maxWidth="full" className="px-2">
+        <Navbar onMenuOpenChange={setIsMenuOpen} maxWidth="full" className="px-2 border-b-1 border-gray-200">
             <NavbarContent justify="start">
                 <NavbarBrand>
                     <NavbarMenuToggle
