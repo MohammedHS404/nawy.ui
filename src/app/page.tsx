@@ -2,30 +2,23 @@
 
 import Image from 'next/image'
 import { useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
-import { PropertyResponse } from "./types/property.list.response";
-import SearchPagination from './components/pagination';
+import { useEffect, useState } from "react";
+import { PropertyResponse } from "./types/propertyResponse";
+import AppPagination from './components/appPagination';
 import { Skeleton } from '@nextui-org/skeleton';
 import { useDebouncedCallback } from 'use-debounce';
 import { imageShimmerBase64 } from './ImageShimmerSrc';
+import { PaginationDto, PropertyFiltersDto, PropertyListRequest } from './types/PropertyListRequest';
 
 interface GetPropertiesResponse {
   properties: PropertyResponse[];
   totalCount: number;
 }
 
-async function getProperties(page: number, query: string): Promise<GetPropertiesResponse> {
+async function getProperties(request: PropertyListRequest): Promise<GetPropertiesResponse> {
   const url = `${process.env.NEXT_PUBLIC_API_URL}/property/list`;
 
-  const body = {
-    pagination: {
-      limit: 24,
-      page
-    },
-    filters: {
-      query: query
-    }
-  }
+  const body: PropertyListRequest = request;
 
   return fetch(url, {
     method: 'POST',
@@ -43,19 +36,24 @@ export default function Home() {
 
   const [error, setError] = useState<Error | null>(null);
 
-  const currentPage = Number(useSearchParams().get('page')) || 1;
+  const searchParams = useSearchParams();
 
-  const query = useSearchParams().get('query') ?? "";
+  const [filters, setFilters] = useState<PropertyFiltersDto>(PropertyFiltersDto.createFromSearchParams(searchParams));
+
+  const currentPage = Number(searchParams.get('page')) || 1;
 
   const debouncedSetLoading = useDebouncedCallback((value: boolean) => {
     setLoading(value);
   }, 500);
 
+  const pagination: PaginationDto = new PaginationDto({ page: currentPage });
+
+  const paginationRequest = new PropertyListRequest({ filters, pagination });
 
   useEffect(() => {
     setLoading(true);
 
-    getProperties(currentPage, query)?.then((response) => {
+    getProperties(paginationRequest)?.then((response) => {
       setData(response);
     }).catch((error) => {
       setError(error);
@@ -63,7 +61,11 @@ export default function Home() {
       .finally(() => {
         debouncedSetLoading(false)
       })
-  }, [currentPage, query]);
+  }, [currentPage, filters]);
+
+  useEffect(() => {
+    setFilters(PropertyFiltersDto.createFromSearchParams(searchParams));
+  }, [...PropertyFiltersDto.createDependencyListFromSearchParams(searchParams)]);
 
   if (error) {
     return <div>Failed to load...</div>;
@@ -86,7 +88,7 @@ export default function Home() {
 
   const propertiesCount = loading ? 'loading' : data.totalCount;
 
-  const pagination = loading ? <></> : <SearchPagination totalPages={totalPages} />;
+  const paginationComponent = loading ? <></> : <AppPagination totalPages={totalPages} />;
 
   return (
     <div className='p-8'>
@@ -95,7 +97,7 @@ export default function Home() {
         {cards}
       </div>
       <div className="flex justify-center pb-8 pt-8">
-        {pagination}
+        {paginationComponent}
       </div>
     </div>
   );

@@ -4,7 +4,7 @@ import { Pagination } from "@nextui-org/pagination";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 
-export default function SearchPagination({ totalPages }: { totalPages: number }) {
+export default function AppPagination({ totalPages }: { totalPages: number }) {
 
     const searchParams = useSearchParams();
 
