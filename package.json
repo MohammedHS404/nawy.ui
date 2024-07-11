@@ -15,6 +15,7 @@
     "@nextui-org/input": "^2.2.2",
     "@nextui-org/navbar": "^2.0.33",
     "@nextui-org/pagination": "^2.0.33",
+    "@nextui-org/select": "^2.2.2",
     "@nextui-org/skeleton": "^2.0.29",
     "@nextui-org/system": "^2.2.2",
     "@nextui-org/theme": "^2.2.6",

@@ -110,13 +110,13 @@ export class PropertyFiltersDto {
             parsedParams.minBathrooms,
             parsedParams.maxBathrooms,
             parsedParams.minArea,
-            parsedParams.maxArea
+            parsedParams.maxArea,
+            parsedParams.type
         ];
     }
 
     private static getParsedParamsFromSearchParams(searchParams: ReadonlyURLSearchParams) {
         const query = searchParams.get('query') || '';
-        const type = searchParams.get('type') || '';
         const minPrice = searchParams.get('minPrice') ? Number(searchParams.get('minPrice')) : 0;
         const maxPrice = searchParams.get('maxPrice') ? Number(searchParams.get('maxPrice')) : 0;
         const minBedrooms = searchParams.get('minBedrooms') ? Number(searchParams.get('minBedrooms')) : 0;
@@ -125,6 +125,7 @@ export class PropertyFiltersDto {
         const maxBathrooms = searchParams.get('maxBathrooms') ? Number(searchParams.get('maxBathrooms')) : 0;
         const minArea = searchParams.get('minArea') ? Number(searchParams.get('minArea')) : 0;
         const maxArea = searchParams.get('maxArea') ? Number(searchParams.get('maxArea')) : 0;
+        const type = searchParams.get('type') || '';
 
         return {
             query,

@@ -1,10 +1,22 @@
 'use client'
 import { Button } from '@nextui-org/button';
 import { Input } from '@nextui-org/input';
+import { Select, SelectItem } from '@nextui-org/select';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useDebouncedCallback } from 'use-debounce';
+
+interface PropertyType {
+    id: number;
+    name: string;
+}
+
+function getPropertyTypes(): Promise<PropertyType[]> {
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/property-type`;
+
+    return fetch(url)
+        .then((res) => res.json());
+}
 
 const AppPropertyFilters = () => {
 
@@ -29,6 +41,16 @@ const AppPropertyFilters = () => {
     const [minArea, setMinArea] = useState(searchParams.get('minArea') || "");
 
     const [maxArea, setMaxArea] = useState(searchParams.get('maxArea') || "");
+
+    const [propertyType, setPropertyType] = useState(searchParams.get('type') || "");
+
+    const [propertyTypes, setPropertyTypes] = useState<string[]>([]);
+
+    useEffect(() => {
+        getPropertyTypes().then((propertyTypes) => {
+            setPropertyTypes(['', ...propertyTypes.map((type) => type.name)]);
+        });
+    }, []);
 
 
     const handleFilterChange = () => {
@@ -56,6 +78,9 @@ const AppPropertyFilters = () => {
         if (maxArea) urlSearchParams.set('maxArea', maxArea);
         else urlSearchParams.delete('maxArea');
 
+        if (propertyType) urlSearchParams.set('type', propertyType);
+        else urlSearchParams.delete('type');
+
         router.replace(`${pathname}?${urlSearchParams.toString()}`);
     };
 
@@ -68,6 +93,7 @@ const AppPropertyFilters = () => {
         setMaxBathrooms('');
         setMinArea('');
         setMaxArea('');
+        setPropertyType('');
     };
 
     if (!showFilters) {
@@ -84,6 +110,17 @@ const AppPropertyFilters = () => {
             }
         >
             <div className='h-full w-full grid grid-cols-4 gap-8'>
+                <Select
+                    label="Select a type"
+                    selectedKeys={[propertyType]}
+                    onChange={(e) => setPropertyType(e.target.value)}
+                >
+                    {propertyTypes.map((type) => (
+                        <SelectItem key={type} value={type}>
+                            {type}
+                        </SelectItem>
+                    ))}
+                </Select>
                 <Input
                     type='number'
                     isClearable
