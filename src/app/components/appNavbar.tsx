@@ -12,6 +12,7 @@ import { AdjustmentsHorizontalIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { Button } from "@nextui-org/button";
 import { useState } from "react";
+import Image from "next/image";
 import { useSearchParams, usePathname, useRouter } from "next/navigation";
 
 export default function AppNavbar() {
@@ -41,7 +42,7 @@ export default function AppNavbar() {
                     />
                     <NavbarItem>
                         <Link color="foreground" href="#">
-                            <img src="/nawy.svg" className="h-8" alt="Nawy Logo" />
+                            <Image src="/nawy.svg" width={80} height={80} className="h-8" alt="Nawy Logo" />
                         </Link>
                     </NavbarItem>
                 </NavbarBrand>

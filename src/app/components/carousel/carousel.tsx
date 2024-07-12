@@ -6,30 +6,30 @@ import { PauseIcon } from '@heroicons/react/24/outline';
 import { ChevronLeftIcon } from '@heroicons/react/24/outline';
 import { Button } from '@nextui-org/button';
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
-const Carousel = ({ images }) => {
+const Carousel = ({ images }: { images: string[] }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false); // Add isPaused state variable
 
-  const prevSlide = () => {
+  const prevSlide = useCallback(() => {
     const isFirstSlide = currentIndex === 0;
     const newIndex = isFirstSlide ? images.length - 1 : currentIndex - 1;
     setCurrentIndex(newIndex);
-  };
+  }, [currentIndex, images.length]);
 
-  const nextSlide = () => {
+  const nextSlide = useCallback(() => {
     const isLastSlide = currentIndex === images.length - 1;
     const newIndex = isLastSlide ? 0 : currentIndex + 1;
     setCurrentIndex(newIndex);
-  };
+  }, [currentIndex, images.length]);
 
   const togglePause = () => {
     setIsPaused(!isPaused);
   };
 
   useEffect(() => {
-    let interval = null;
+    let interval: NodeJS.Timeout | null = null;
 
     if (!isPaused) {
       interval = setInterval(() => {
@@ -38,9 +38,10 @@ const Carousel = ({ images }) => {
     }
 
     return () => {
+      if (!interval) return;
       clearInterval(interval);
     };
-  }, [currentIndex, isPaused]);
+  }, [currentIndex, nextSlide, isPaused]);
 
   return (
     <div className="relative w-full">
@@ -57,7 +58,7 @@ const Carousel = ({ images }) => {
               height={720}
               alt={`Slide ${index}`}
               className="w-full flex-shrink-0 object-cover max-h-[720px]"
-              placeholder={'data:image/svg+xml;base64,' + imageShimmerBase64(1080, 720)}
+              placeholder={`data:image/svg+xml;base64,${imageShimmerBase64(1080, 720)}`}
             />
           ))}
         </div>

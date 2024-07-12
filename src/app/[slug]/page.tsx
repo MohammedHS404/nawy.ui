@@ -15,31 +15,40 @@ function getProperty(slug: string) {
 }
 
 export default function Property() {
-    const [property, setProperty] = useState<PropertyResponse>(null);
+    const [property, setProperty] = useState<PropertyResponse>({} as PropertyResponse);
 
     const [loading, setLoading] = useState(true);
 
     const { slug } = useParams();
 
-    if (Array.isArray(slug)) {
-        return <div>Invalid slug</div>;
-    }
-
     useEffect(() => {
+        if (Array.isArray(slug)) {
+            return;
+        }
+
         setLoading(true);
         getProperty(slug).then((property) => {
             setProperty(property);
         }).finally(() => {
             setLoading(false);
         })
-    }, []);
+    }, [slug]);
+
+
+    if (Array.isArray(slug)) {
+        return <div>Invalid slug</div>;
+    }
+
+    if (!property && !loading) {
+        return <div>Property not found</div>;
+    }
 
     return (
         <div className="px-8">
             <div className="container mx-auto">
                 <div className="w-full">
                     {
-                        loading ? <Skeleton className='w-full h-[720px]'></Skeleton> : <Carousel images={property.images} />
+                        loading ? <Skeleton className='w-full h-[720px]'></Skeleton> : <Carousel images={property.images ?? []} />
                     }
                 </div>
                 <br />
@@ -89,7 +98,7 @@ export default function Property() {
                             <div className="grid grid-cols-4 gap-4">
                                 {property.images.map((image, index) => (
                                     <Image key={index} width={480} height={480} src={image} alt={`Image ${index}`} className="w-full" placeholder={
-                                        'data:image/svg+xml;base64,' + imageShimmerBase64(480, 480)
+                                        `data:image/svg+xml;base64,${imageShimmerBase64(480, 480)}`
                                     } />
                                 ))}
                             </div>
@@ -104,7 +113,7 @@ export default function Property() {
                             {property.plans.map((floorPlan, index) => (
                                 <Image key={index} width={480} height={480} src={floorPlan} alt={`Floor Plan ${index}`} className="w-full"
                                     placeholder={
-                                        'data:image/svg+xml;base64,' + imageShimmerBase64(480, 480)
+                                        `data:image/svg+xml;base64,${imageShimmerBase64(480, 480)}`
                                     } />
                             ))}
                         </div>

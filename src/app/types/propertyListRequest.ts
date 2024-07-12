@@ -96,25 +96,6 @@ export class PropertyFiltersDto {
         return filters;
     };
 
-    public static createDependencyListFromSearchParams(searchParams: ReadonlyURLSearchParams) {
-
-        const parsedParams = this.getParsedParamsFromSearchParams(searchParams);
-
-        return [
-            parsedParams.query,
-            parsedParams.type,
-            parsedParams.minPrice,
-            parsedParams.maxPrice,
-            parsedParams.minBedrooms,
-            parsedParams.maxBedrooms,
-            parsedParams.minBathrooms,
-            parsedParams.maxBathrooms,
-            parsedParams.minArea,
-            parsedParams.maxArea,
-            parsedParams.type
-        ];
-    }
-
     private static getParsedParamsFromSearchParams(searchParams: ReadonlyURLSearchParams) {
         const query = searchParams.get('query') || '';
         const minPrice = searchParams.get('minPrice') ? Number(searchParams.get('minPrice')) : 0;

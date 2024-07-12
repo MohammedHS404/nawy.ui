@@ -2,13 +2,14 @@
 
 import Image from 'next/image'
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { PropertyResponse } from "./types/propertyResponse";
 import AppPagination from './components/appPagination';
 import { Skeleton } from '@nextui-org/skeleton';
 import { useDebouncedCallback } from 'use-debounce';
 import { imageShimmerBase64 } from './components/ImageShimmerSrc';
-import { PaginationDto, PropertyFiltersDto, PropertyListRequest } from './types/PropertyListRequest';
+import { PaginationDto, PropertyFiltersDto, PropertyListRequest } from './types/propertyListRequest';
+import useDeepCompareEffect from 'use-deep-compare-effect';
 
 interface GetPropertiesResponse {
   properties: PropertyResponse[];
@@ -46,9 +47,16 @@ export default function Home() {
     setLoading(value);
   }, 500);
 
-  const pagination: PaginationDto = new PaginationDto({ page: currentPage });
+  const pagination: PaginationDto = useMemo(() => {
+    return new PaginationDto({ page: currentPage, limit: 24 });
+  }, [currentPage]);
 
-  const paginationRequest = new PropertyListRequest({ filters, pagination });
+  const paginationRequest = useMemo(() => {
+    return new PropertyListRequest({
+      pagination: pagination,
+      filters: filters
+    });
+  }, [pagination, filters]);
 
   useEffect(() => {
     setLoading(true);
@@ -61,11 +69,16 @@ export default function Home() {
       .finally(() => {
         debouncedSetLoading(false)
       })
-  }, [currentPage, filters]);
+  }, [paginationRequest, debouncedSetLoading]);
 
-  useEffect(() => {
-    setFilters(PropertyFiltersDto.createFromSearchParams(searchParams));
-  }, [...PropertyFiltersDto.createDependencyListFromSearchParams(searchParams)]);
+  const filtersFromSearchParams = useMemo(() => {
+    return PropertyFiltersDto.createFromSearchParams(searchParams);
+  }, [searchParams]);
+
+  useDeepCompareEffect(() => {
+    setFilters(filtersFromSearchParams);
+
+  }, [filtersFromSearchParams]);
 
   if (error) {
     return <div>Failed to load...</div>;
@@ -104,7 +117,7 @@ export default function Home() {
 }
 
 function PropertyCard({ property, loading }: { property?: PropertyResponse, loading?: boolean }) {
-  const router=useRouter();
+  const router = useRouter();
 
   if (!property && !loading) {
     return <></>;
@@ -119,7 +132,7 @@ function PropertyCard({ property, loading }: { property?: PropertyResponse, load
   }
 
   return (
-    <div onClick={e=>handleCardClick()} className="w-full cursor-pointer transform rounded-lg bg-white  shadow-md duration-300 hover:scale-105 hover:shadow-lg">
+    <div onClick={e => handleCardClick()} className="w-full cursor-pointer transform rounded-lg bg-white  shadow-md duration-300 hover:scale-105 hover:shadow-lg">
       {loading ?
         <Skeleton className="h-72 w-full object-cover object-center"></Skeleton> :
         <Image
